@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voz a Texto</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #output {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      min-height: 50px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Transcripción de Voz a Texto</h1>
+  <button id="start">Iniciar Grabación</button>
+  <button id="stop">Detener Grabación</button>
+  <p><strong>Texto transcrito:</strong></p>
+  <div id="output"></div>
+
+  <script>
+    // Verificar soporte de la API
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert("Tu navegador no soporta la Web Speech API. Por favor, usa Google Chrome.");
+    } else {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+
+      recognition.lang = 'es-ES'; // Idioma: Español
+      recognition.continuous = true; // Seguir escuchando hasta que lo detengas
+      recognition.interimResults = true; // Mostrar resultados parciales mientras escucha
+
+      const startButton = document.getElementById('start');
+      const stopButton = document.getElementById('stop');
+      const output = document.getElementById('output');
+
+      // Eventos
+      startButton.addEventListener('click', () => {
+        recognition.start();
+        output.textContent = "Escuchando...";
+      });
+
+      stopButton.addEventListener('click', () => {
+        recognition.stop();
+        output.textContent = "Grabación detenida.";
+      });
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = 0; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        output.textContent = transcript;
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Error:", event.error);
+        output.textContent = `Error: ${event.error}`;
+      };
+    }
+  </script>
+</body>
+</html>
